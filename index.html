@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Year Progress</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #1e1e2f;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #progress {
+      font-size: 3em;
+      font-weight: bold;
+    }
+
+    .note {
+      margin-top: 20px;
+      font-size: 1.2em;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div id="progress">Loading...</div>
+  <div class="note">You still have time — stay focused! 🚀</div>
+
+  <script>
+    function updateYearRemaining() {
+      const now = new Date();
+      const startOfYear = new Date(now.getFullYear(), 0, 1);
+      const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+
+      const totalTime = endOfYear - startOfYear;
+      const timeElapsed = now - startOfYear;
+      const timeRemaining = totalTime - timeElapsed;
+
+      const percentRemaining = (timeRemaining / totalTime) * 100;
+
+      document.getElementById('progress').textContent =
+        percentRemaining.toFixed(2) + "% of " + now.getFullYear() + " remains";
+    }
+
+    updateYearRemaining(); // Call once immediately
+    setInterval(updateYearRemaining, 60000); // Update every 1 minute
+  </script>
+</body>
+</html>
