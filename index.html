@@ -14,25 +14,75 @@
       align-items: center;
       height: 100vh;
       margin: 0;
+      overflow: hidden;
     }
 
     #progress {
       font-size: 3em;
       font-weight: bold;
+      text-align: center;
+      transition: all 0.1s ease;
+    }
+
+    .percentage {
+      color: #00ff88;
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+
+    .year-info {
+      font-size: 0.8em;
+      opacity: 0.8;
     }
 
     .note {
       margin-top: 20px;
       font-size: 1.2em;
       opacity: 0.7;
+      text-align: center;
+    }
+
+    .counter-animation {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    .progress-bar {
+      width: 300px;
+      height: 10px;
+      background-color: #333;
+      border-radius: 5px;
+      margin: 20px 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #00ff88, #00ccff);
+      border-radius: 5px;
+      transition: width 0.1s ease;
     }
   </style>
 </head>
 <body>
-  <div id="progress">Loading...</div>
+  <div id="progress">
+    <div class="percentage" id="percentage">Loading...</div>
+    <div class="year-info" id="yearInfo"></div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+  </div>
   <div class="note">You still have time — stay focused! 🚀</div>
 
   <script>
+    let animationId;
+    let lastPercentage = 0;
+
     function updateYearRemaining() {
       const now = new Date();
       const startOfYear = new Date(now.getFullYear(), 0, 1);
@@ -43,13 +93,54 @@
       const timeRemaining = totalTime - timeElapsed;
 
       const percentRemaining = (timeRemaining / totalTime) * 100;
-
-      document.getElementById('progress').textContent =
-        percentRemaining.toFixed(2) + "% of " + now.getFullYear() + " remains";
+      
+      // Add smooth animation effect
+      const currentPercentage = parseFloat(percentRemaining.toFixed(6));
+      
+      // Animate the percentage change
+      if (Math.abs(currentPercentage - lastPercentage) > 0.000001) {
+        document.getElementById('percentage').textContent = 
+          currentPercentage.toFixed(6) + "%";
+        
+        document.getElementById('yearInfo').textContent = 
+          `of ${now.getFullYear()} remains`;
+        
+        // Update progress bar
+        const progressWidth = (currentPercentage / 100) * 100;
+        document.getElementById('progressFill').style.width = progressWidth + '%';
+        
+        // Add animation class for visual feedback
+        document.getElementById('percentage').classList.add('counter-animation');
+        setTimeout(() => {
+          document.getElementById('percentage').classList.remove('counter-animation');
+        }, 50);
+        
+        lastPercentage = currentPercentage;
+      }
     }
 
-    updateYearRemaining(); // Call once immediately
-    setInterval(updateYearRemaining, 60000); // Update every 1 minute
+    function startCounter() {
+      updateYearRemaining(); // Call once immediately
+      animationId = setInterval(updateYearRemaining, 10); // Update every 10ms for maximum smoothness
+    }
+
+    function stopCounter() {
+      if (animationId) {
+        clearInterval(animationId);
+      }
+    }
+
+    // Start the counter when page loads
+    startCounter();
+
+    // Pause animation when tab is not visible (optional performance optimization)
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        stopCounter();
+      } else {
+        startCounter();
+      }
+    });
   </script>
 </body>
 </html>
